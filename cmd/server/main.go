@@ -10,5 +10,6 @@ import (
 func main() {
 	log.Println("Starting GoAuthserver on :8080")
 	http.HandleFunc("/health", handlers.HealthHandler)
+	http.HandleFunc("/signup", handlers.SignpHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
