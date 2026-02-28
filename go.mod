@@ -1,3 +1,5 @@
 module github.com/Siwani-tech/GoAuth-Lite.git
 
-go 1.22.0
+go 1.24.0
+
+require golang.org/x/crypto v0.48.0 // indirect

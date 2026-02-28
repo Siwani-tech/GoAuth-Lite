@@ -11,5 +11,6 @@ func main() {
 	log.Println("Starting GoAuthserver on :8080")
 	http.HandleFunc("/health", handlers.HealthHandler)
 	http.HandleFunc("/signup", handlers.SignpHandler)
+	http.HandleFunc("/login", handlers.LoginHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

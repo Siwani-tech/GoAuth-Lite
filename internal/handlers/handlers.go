@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Siwani-tech/GoAuth-Lite.git/internal/models"
+	"github.com/Siwani-tech/GoAuth-Lite.git/internal/services"
 )
 
 func HealthHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,17 +27,11 @@ func SignpHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	if user.Email == "" || user.Password == "" {
+	err = services.Signup(user)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
-			"error": "email and password are required",
-		})
-		return
-	}
-	if len(user.Password) < 8 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(map[string]string{
-			"error": "password must be at least 8 characters",
+			"error": err.Error(),
 		})
 		return
 	}
@@ -46,4 +41,34 @@ func SignpHandler(w http.ResponseWriter, r *http.Request) {
 		"message": "user created ",
 	})
 
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var user models.User
+	err := json.NewDecoder(r.Body).Decode(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": "Invalid request body",
+		})
+		return
+	}
+	err = services.Login(user.Email, user.Password)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "user logged in ",
+	})
 }
