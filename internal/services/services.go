@@ -29,18 +29,29 @@ func Signup(user models.User) error {
 	return nil
 }
 
-func Login(email string, password string) error {
+func Login(email string, password string) (string, error) {
+
 	if email == "" || password == "" {
-		return errors.New("email and password are required")
+		return "", errors.New("email and password are required")
 	}
+
 	user, err := repository.GetUserByEmail(email)
+
 	if err != nil {
-		return errors.New("invalid credentials")
+		return "", errors.New("invalid credentials")
 	}
 
 	err = utils.CheckPasshash(password, user.Password)
+
 	if err != nil {
-		return errors.New("invalid credentials")
+		return "", errors.New("invalid credentials")
 	}
-	return nil
+
+	token, err := utils.GenerateToken(user.Email)
+
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

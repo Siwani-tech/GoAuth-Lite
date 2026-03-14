@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/Siwani-tech/GoAuth-Lite.git/internal/middleware"
 	"github.com/Siwani-tech/GoAuth-Lite.git/internal/models"
 	"github.com/Siwani-tech/GoAuth-Lite.git/internal/services"
 )
@@ -44,13 +45,16 @@ func SignpHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
+
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		return
 	}
 
 	var user models.User
+
 	err := json.NewDecoder(r.Body).Decode(&user)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -58,7 +62,9 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	err = services.Login(user.Email, user.Password)
+
+	token, err := services.Login(user.Email, user.Password)
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		json.NewEncoder(w).Encode(map[string]string{
@@ -68,7 +74,14 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
+
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "user logged in ",
+		"token": token,
 	})
+}
+
+func ProfileHandler(w http.ResponseWriter, r *http.Request) {
+	emails := r.Context().Value(middleware.Useremailkey).(string)
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Hii there " + "  " + emails))
 }
