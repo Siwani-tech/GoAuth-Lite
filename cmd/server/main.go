@@ -16,5 +16,3 @@ func main() {
 	http.HandleFunc("/profile", middleware.AuthMiddleware(handlers.ProfileHandler))
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
-
-//
